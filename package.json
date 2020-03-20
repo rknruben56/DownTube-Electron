@@ -16,6 +16,7 @@
     "@types/fluent-ffmpeg": "^2.1.14"
   },
   "dependencies": {
+    "bootstrap": "^4.4.1",
     "fluent-ffmpeg": "^2.1.2",
     "ytdl-core": "^2.0.0"
   }
