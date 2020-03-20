@@ -1,0 +1,13 @@
+{
+  "name": "DownTube",
+  "version": "1.0.0",
+  "description": "Electron app that downloads YouTube videos",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "rknruben56",
+  "devDependencies": {
+    "electron": "^8.1.1"
+  }
+}
