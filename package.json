@@ -2,12 +2,21 @@
   "name": "DownTube",
   "version": "1.0.0",
   "description": "Electron app that downloads YouTube videos",
-  "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "start": "npm run build && electron ./dist/main.js"
   },
   "author": "rknruben56",
   "devDependencies": {
-    "electron": "^8.1.1"
+    "electron": "^8.1.1",
+    "tslint": "^5.19.0",
+    "typescript": "^3.8.3",
+    "@types/fluent-ffmpeg": "^2.1.14"
+  },
+  "dependencies": {
+    "fluent-ffmpeg": "^2.1.2",
+    "ytdl-core": "^2.0.0"
   }
 }
