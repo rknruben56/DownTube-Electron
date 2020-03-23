@@ -1,6 +1,7 @@
-import readline = require('readline');
-import ytdl = require('ytdl-core');
-import ffmpeg = require('fluent-ffmpeg');
+import * as readline from 'readline';
+import * as ytdl from 'ytdl-core';
+import * as ffmpeg from 'fluent-ffmpeg';
+
 import { Downloader } from './downloader';
 
 export class Mp3Downloader implements Downloader {

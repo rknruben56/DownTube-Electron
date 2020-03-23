@@ -1,5 +1,5 @@
 {
-  "name": "DownTube",
+  "name": "downtube",
   "version": "1.0.0",
   "description": "Electron app that downloads YouTube videos",
   "scripts": {
