@@ -3,14 +3,15 @@
  */
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { App } from '../app/app';
 
 // Import the styles here to process them with webpack
 import '@public/style.css';
 
 ReactDOM.render(
-  <div className='app'>
-    <h4>Welcome to React, Electron and Typescript</h4>
-    <p>Hello</p>
+  <div className='app container-fluid'>
+    <h1>DownTube</h1>
+    <App />
   </div>,
   document.getElementById('app')
 );
