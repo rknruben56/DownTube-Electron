@@ -1,15 +1,19 @@
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
+import * as mp3Downloader from '../downloaders/mp3-downloader';
 
 interface AppForm {
   url: string;
   title: string;
-  directory?: string;
+  directory: string;
 }
 
 const App = () => {
   const { register, handleSubmit } = useForm();
-  const onSubmit = (data: AppForm) => { console.log(data) };
+  const onSubmit = (data: AppForm) => { 
+    console.log(data)
+    // mp3Downloader.download(data.url, data.directory, data.title);
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}> 
