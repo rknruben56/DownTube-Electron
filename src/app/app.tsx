@@ -3,12 +3,7 @@ import { useForm, ErrorMessage } from 'react-hook-form';
 import { homedir } from 'os';
 import { youtubeControl } from '../youtube/youtube-control';
 import LoadingOverlay from 'react-loading-overlay';
-
-interface AppForm {
-  url: string;
-  title: string;
-  directory: string;
-}
+import { AppForm } from './app-form';
 
 const defaultDirectory = `${homedir}/Youtube`;
 const defaultTitle = 'Download';
@@ -24,7 +19,7 @@ const App = () => {
   const [isActive, setActive] = React.useState(false);
   const [loadingText, setLoadingText] = React.useState('');
 
-  const { register, handleSubmit, errors, getValues, setValue, setError, clearError, triggerValidation } = useForm();
+  const { register, handleSubmit, errors, getValues, setValue, clearError, triggerValidation } = useForm();
   
   const onSubmit = (data: AppForm) => {
     let directory = data.directory || defaultDirectory;

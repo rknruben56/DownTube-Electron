@@ -3,6 +3,7 @@ import { YtInfo } from './youtubedl-info';
 
 class YoutubeControl {
 
+  private audioOptions = ['-x', '--audio-format', 'mp3'];
   /**
    * Gets the title of the video from the URL
    * @param url 
@@ -20,7 +21,13 @@ class YoutubeControl {
    * @param title 
    */
   public download(url: string, directory: string, title: string) {
-    //youtubedl.exec(url, this.audioOptions, )
+    youtubedl.exec(url, this.audioOptions, {}, (error, output) => {
+      if (error) {
+        throw error;
+      } else {
+        console.log(output.join('\n'));
+      }
+    });
   }
 
   private async getVideoInfo(url: string, options: any): Promise<Array<YtInfo>> {
