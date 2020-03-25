@@ -1,11 +1,11 @@
-.app {
-  color: grey;
-}
-
 .submit {
   padding: 5em 0em;
 }
 
-span {
+p {
   color: red;
+}
+
+.spinner {
+  display: block;
 }
