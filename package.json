@@ -30,15 +30,14 @@
   "author": "rknruben56",
   "license": "MIT",
   "dependencies": {
-    "@types/fluent-ffmpeg": "^2.1.14",
     "@types/react": "^16.9.13",
     "@types/react-dom": "^16.9.4",
+    "@types/youtube-dl": "^1.12.2",
     "bootstrap": "^4.4.1",
-    "fluent-ffmpeg": "^2.1.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-hook-form": "^5.1.3",
-    "ytdl-core": "^2.0.1"
+    "youtube-dl": "^3.0.2"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
@@ -79,7 +78,7 @@
     "url": "git+https://github.com/rknruben56/DownTube"
   },
   "keywords": [
-    "boilerplate",
+    "YouTube",
     "Electron",
     "React",
     "Typescript",

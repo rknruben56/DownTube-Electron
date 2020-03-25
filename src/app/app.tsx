@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import * as mp3Downloader from '../downloaders/mp3-downloader';
+import { homedir } from 'os';
+import { youtubeControl } from '../youtube/youtube-control';
 
 interface AppForm {
   url: string;
@@ -8,18 +9,24 @@ interface AppForm {
   directory: string;
 }
 
+const defaultDirectory = `${homedir}/Youtube`;
+const defaultTitle = 'Download';
+
 const App = () => {
-  const { register, handleSubmit } = useForm();
-  const onSubmit = (data: AppForm) => { 
+  const { register, handleSubmit, errors } = useForm();
+  const onSubmit = (data: AppForm) => {
     console.log(data)
-    // mp3Downloader.download(data.url, data.directory, data.title);
+    let directory = data.directory || defaultDirectory;
+    let title = data.title || defaultTitle;
+    youtubeControl.download(data.url, directory, title);
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}> 
       <div className="form-group">
         <label htmlFor="url">YouTube URL</label>
-        <input id="url" name="url" className="form-control" ref={register} />
+        <input id="url" name="url" className="form-control" ref={register({ required: true })} />
+        {errors.url && <span className="error">This field is required.</span>}
       </div>
       <div className="form-group">
         <label htmlFor="title">Title</label>
