@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, ErrorMessage } from 'react-hook-form';
 import { homedir } from 'os';
 import { youtubeControl } from '../youtube/youtube-control';
 import LoadingOverlay from 'react-loading-overlay';
@@ -12,12 +12,19 @@ interface AppForm {
 
 const defaultDirectory = `${homedir}/Youtube`;
 const defaultTitle = 'Download';
+const urlValidation = {
+  required: 'This field is required.', 
+  pattern: { 
+    value: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//, 
+    message: 'Please enter a valid YouTube URL.'
+  } 
+};
 
 const App = () => {
   const [isActive, setActive] = React.useState(false);
   const [loadingText, setLoadingText] = React.useState('');
 
-  const { register, handleSubmit, errors, getValues, setValue } = useForm();
+  const { register, handleSubmit, errors, getValues, setValue, setError, clearError, triggerValidation } = useForm();
   
   const onSubmit = (data: AppForm) => {
     let directory = data.directory || defaultDirectory;
@@ -25,10 +32,18 @@ const App = () => {
     youtubeControl.download(data.url, directory, title);
   };
 
-  const onUrlBlur = () => {
+  const onUrlBlur = async () => {
     let values = getValues();
     let url = values.url;
     if (url) {
+      await setTitle(url);
+    }
+  };
+
+  const setTitle = async (url: string) => {
+    let result = await triggerValidation('url');
+    if (result) {
+      clearError('url');
       startLoading('Loading title');
       youtubeControl.getTitle(url)
         .then(title => {
@@ -55,8 +70,8 @@ const App = () => {
         <form onSubmit={handleSubmit(onSubmit)}> 
           <div className="form-group">
             <label htmlFor="url">YouTube URL</label>
-            <input id="url" name="url" className="form-control" ref={register({ required: true })} onBlur={onUrlBlur} />
-            {errors.url && <span className="error">This field is required.</span>}
+            <input id="url" name="url" className="form-control" ref={register(urlValidation)} onBlur={onUrlBlur} />
+            <ErrorMessage errors={errors} name="url" as="span"/>
           </div>
           <div className="form-group">
             <label htmlFor="title">Title</label>
