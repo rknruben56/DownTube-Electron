@@ -4,11 +4,15 @@ import { homedir } from 'os';
 import { youtubeService } from '../services/youtube-service';
 import LoadingOverlay from 'react-loading-overlay';
 import { AppForm } from './app-form';
+import { DownloadParams } from '../services/download-params';
+import { Button } from 'react-bootstrap';
 
-const defaultDirectory = `${homedir}/Youtube`;
+const defaultDirectory = `${homedir}\\Youtube`;
 const defaultTitle = 'Download';
+const requiredMessage = 'This field is required.';
+
 const urlValidation = {
-  required: 'This field is required.', 
+  required: requiredMessage, 
   pattern: { 
     value: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//, 
     message: 'Please enter a valid YouTube URL.'
@@ -18,13 +22,26 @@ const urlValidation = {
 const App = () => {
   const [isActive, setActive] = React.useState(false);
   const [loadingText, setLoadingText] = React.useState('');
+  const [isSuccess, setSuccess] = React.useState(false);
+  const [isError, setError] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
 
   const { register, handleSubmit, errors, getValues, setValue, clearError, triggerValidation } = useForm();
   
   const onSubmit = (data: AppForm) => {
     let directory = data.directory || defaultDirectory;
     let title = data.title || defaultTitle;
-    youtubeService.download(data.url, directory, title);
+
+    let downloadParams: DownloadParams = {
+      url: data.url,
+      directory: directory,
+      title: title,
+      onComplete: onDownloadComplete,
+      onError: onError
+    };
+
+    startLoading('Downloading video');
+    youtubeService.download(downloadParams);
   };
 
   const onUrlBlur = async () => {
@@ -58,11 +75,22 @@ const App = () => {
     setLoadingText('');
   }
 
+  const onError = (output: string) => {
+    stopLoading();
+    setError(true);
+    setErrorMessage(output);
+  }
+
+  const onDownloadComplete = () => {
+    stopLoading();
+    setSuccess(true);
+  };
+
   return (
     <LoadingOverlay active={isActive} spinner text={loadingText}>
       <div className='app container-fluid'>
         <h1>DownTube</h1>
-        <form onSubmit={handleSubmit(onSubmit)}> 
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="form-group">
             <label htmlFor="url">YouTube URL</label>
             <input id="url" name="url" className="form-control" ref={register(urlValidation)} onBlur={onUrlBlur} />
@@ -74,12 +102,16 @@ const App = () => {
           </div>
           <div className="form-group">
             <label htmlFor="directory">Folder</label>
-            <button type="button" id="directory" name="directory" className="btn btn-secondary form-control">Select Folder</button>
+            <input id="directory" className="form-control" name="directory" defaultValue={defaultDirectory} ref={register({ required: requiredMessage })} />
+            <ErrorMessage errors={errors} name="directory" as="span"/>
+            <Button variant="secondary" type="button" size="lg" block>Select Folder</Button>
           </div>
           <div className="submit">
-            <button id="download" className="btn btn-primary btn-lg btn-block">Download</button>
+            <Button variant="primary" type="submit" size="lg" block>Download</Button>
           </div>
         </form>
+        {isError && <div className="alert alert-danger" role="alert">{errorMessage}</div>}
+        {isSuccess && <div className="alert alert-success" role="alert">Video Successfully downloaded!</div>}
       </div>
     </LoadingOverlay>
   )

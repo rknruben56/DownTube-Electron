@@ -1,5 +1,6 @@
 import * as youtubedl from 'youtube-dl';
 import { YtInfo } from './youtubedl-info';
+import { DownloadParams } from './download-params';
 
 const ffmpegPath = require('ffmpeg-static');
 const spawn = require('child_process').spawn;
@@ -25,19 +26,17 @@ class YoutubeService {
    * @param directory 
    * @param title 
    */
-  public download(url: string, directory: string, title: string) {
+  public download(downloadParams: DownloadParams) {
     let binaryPath = youtubedl.getYtdlBinary();
-    let ls = spawn(binaryPath, this.getOptions(url, directory, title));
+    let options = this.getOptions(downloadParams.url, downloadParams.directory, downloadParams.title);
+    let ls = spawn(binaryPath, options);
 
-    ls.stdout.on('data', data => {
-      console.log(`stdout: ${data}`);
-    });
     ls.stderr.on('data', data => {
-      console.log(`error ${data}`);
+      downloadParams.onError(data);
     });
     ls.on('close', code => {
       if (code == 0) {
-        console.log('download complete');
+        downloadParams.onComplete();
       }
     });
   }
