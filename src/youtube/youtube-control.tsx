@@ -1,4 +1,5 @@
 import * as youtubedl from 'youtube-dl';
+import { YtInfo } from './youtubedl-info';
 
 class YoutubeControl {
 
@@ -7,9 +8,9 @@ class YoutubeControl {
    * @param url 
    */
   public async getTitle(url: string): Promise<string> {
-    let options = ['--dump-single-json'];
+    let options = ['-j', '--flat-playlist', '--dump-single-json'];
     let info = await this.getVideoInfo(url, options);
-    return info ? info.filename : '';
+    return info ? info[0].fulltitle : '';
   }
 
   /**
@@ -22,11 +23,10 @@ class YoutubeControl {
     //youtubedl.exec(url, this.audioOptions, )
   }
 
-  private async getVideoInfo(url: string, options: any): Promise<youtubedl.Info> {
+  private async getVideoInfo(url: string, options: any): Promise<Array<YtInfo>> {
     return new Promise((resolve, reject) => {
-      youtubedl.getInfo(url, options, (error: Error, data: youtubedl.Info) => {
+      youtubedl.getInfo(url, options, (error: Error, data: Array<YtInfo>) => {
         if (error) {
-          console.log(error);
           reject(error);
         } else {
           resolve(data);

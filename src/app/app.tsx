@@ -21,13 +21,15 @@ const App = () => {
     youtubeControl.download(data.url, directory, title);
   };
 
-  const onUrlBlur = async () => {
-    console.log('getting title...');
+  const onUrlBlur = () => {
     let values = getValues();
     let url = values.url;
     if (url) {
-      let title = await youtubeControl.getTitle(url);
-      setValue('title', title);
+      // TODO: Add loading spinner
+      youtubeControl.getTitle(url)
+        .then(title => {
+          setValue('title', title);
+        });
     }
   };
 
