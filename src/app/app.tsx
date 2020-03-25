@@ -13,7 +13,7 @@ const defaultDirectory = `${homedir}/Youtube`;
 const defaultTitle = 'Download';
 
 const App = () => {
-  const { register, handleSubmit, errors } = useForm();
+  const { register, handleSubmit, errors, getValues, setValue } = useForm();
   const onSubmit = (data: AppForm) => {
     console.log(data)
     let directory = data.directory || defaultDirectory;
@@ -21,11 +21,21 @@ const App = () => {
     youtubeControl.download(data.url, directory, title);
   };
 
+  const onUrlBlur = async () => {
+    console.log('getting title...');
+    let values = getValues();
+    let url = values.url;
+    if (url) {
+      let title = await youtubeControl.getTitle(url);
+      setValue('title', title);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}> 
       <div className="form-group">
         <label htmlFor="url">YouTube URL</label>
-        <input id="url" name="url" className="form-control" ref={register({ required: true })} />
+        <input id="url" name="url" className="form-control" ref={register({ required: true })} onBlur={onUrlBlur} />
         {errors.url && <span className="error">This field is required.</span>}
       </div>
       <div className="form-group">
