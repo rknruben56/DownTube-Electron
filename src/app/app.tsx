@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useForm, ErrorMessage } from 'react-hook-form';
 import { homedir } from 'os';
-import { youtubeControl } from '../youtube/youtube-control';
+import { youtubeService } from '../services/youtube-service';
 import LoadingOverlay from 'react-loading-overlay';
 import { AppForm } from './app-form';
 
@@ -24,7 +24,7 @@ const App = () => {
   const onSubmit = (data: AppForm) => {
     let directory = data.directory || defaultDirectory;
     let title = data.title || defaultTitle;
-    youtubeControl.download(data.url, directory, title);
+    youtubeService.download(data.url, directory, title);
   };
 
   const onUrlBlur = async () => {
@@ -40,7 +40,7 @@ const App = () => {
     if (result) {
       clearError('url');
       startLoading('Loading title');
-      youtubeControl.getTitle(url)
+      youtubeService.getTitle(url)
         .then(title => {
           setValue('title', title);
           stopLoading();
