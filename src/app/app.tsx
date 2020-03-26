@@ -3,7 +3,6 @@ import { useForm, ErrorMessage } from 'react-hook-form';
 import { homedir } from 'os';
 import { youtubeService } from '../services/youtube-service';
 import { AppForm } from './app-form';
-import { DownloadParams } from '../services/download-params';
 import { Button, Spinner } from 'react-bootstrap';
 
 const defaultDirectory = `${homedir}\\Youtube`;
@@ -31,16 +30,14 @@ const App = () => {
     let directory = data.directory || defaultDirectory;
     let title = data.title || defaultTitle;
 
-    let downloadParams: DownloadParams = {
-      url: data.url,
-      directory: directory,
-      title: title,
-      onComplete: onDownloadComplete,
-      onError: onError
-    };
-
     setDownloading(true);
-    youtubeService.download(downloadParams);
+    youtubeService.download(data.url, directory, title)
+      .then(() => {
+        onDownloadComplete();
+      })
+      .catch(rej => {
+        onError(rej);
+      });
   };
 
   const onUrlBlur = async () => {
