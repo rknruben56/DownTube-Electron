@@ -6,6 +6,8 @@ import { AppForm } from './app-form';
 import { Button, Spinner } from 'react-bootstrap';
 import { debounce } from 'lodash';
 
+const { dialog } = require('electron').remote;
+
 const defaultDirectory = `${homedir}\\Youtube`;
 const defaultTitle = 'DownloadedVideo';
 const requiredMessage = 'This field is required.';
@@ -71,6 +73,12 @@ const App = () => {
       });
   }, 150);
 
+  const onSelectFolderClick = () => {
+    let selectedFolder = dialog.showOpenDialog({ properties: ['openDirectory']});
+    let directory = selectedFolder || defaultDirectory;
+    setValue('directory', directory);
+  }
+
   const onError = (output: string) => {
     setDownloading(false);
     setError(true);
@@ -98,9 +106,9 @@ const App = () => {
         </div>
         <div className="form-group">
           <label htmlFor="directory">Folder</label>
-          <input id="directory" className="form-control" name="directory" defaultValue={defaultDirectory} ref={register({ required: requiredMessage })} />
+          <input id="directory" className="form-control directory-input" name="directory" defaultValue={defaultDirectory} ref={register({ required: requiredMessage })} />
           <ErrorMessage errors={errors} name="directory" as="p" />
-          <Button variant="secondary" type="button" size="lg" block>Select Folder</Button>
+          <Button variant="secondary" type="button" size="lg" block onClick={onSelectFolderClick}>Select Folder</Button>
         </div>
         <div className="submit">
           <Button variant="primary" type="submit" size="lg" block disabled={isDownloading || isLoading}>

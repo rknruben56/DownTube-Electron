@@ -9,3 +9,7 @@ p {
 .spinner {
   display: block;
 }
+
+.directory-input {
+  margin-bottom: 1em;
+}
