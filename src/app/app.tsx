@@ -4,9 +4,10 @@ import { homedir } from 'os';
 import { youtubeService } from '../services/youtube-service';
 import { AppForm } from './app-form';
 import { Button, Spinner } from 'react-bootstrap';
+import { debounce } from 'lodash';
 
 const defaultDirectory = `${homedir}\\Youtube`;
-const defaultTitle = 'Download';
+const defaultTitle = 'DownloadedVideo';
 const requiredMessage = 'This field is required.';
 
 const urlValidation = {
@@ -27,8 +28,8 @@ const App = () => {
   const { register, handleSubmit, errors, getValues, setValue, clearError, triggerValidation } = useForm();
 
   const onSubmit = (data: AppForm) => {
-    let directory = data.directory || defaultDirectory;
-    let title = data.title || defaultTitle;
+    const directory = data.directory || defaultDirectory;
+    const title = data.title || defaultTitle;
 
     setDownloading(true);
     youtubeService.download(data.url, directory, title)
@@ -40,27 +41,35 @@ const App = () => {
       });
   };
 
-  const onUrlBlur = async () => {
-    let values = getValues();
-    let url = values.url;
+  const onUrlChange = async () => {
+    const values = getValues();
+    const url = values.url;
     if (url) {
       await setTitle(url);
     }
   };
 
   const setTitle = async (url: string) => {
-    let result = await triggerValidation('url');
+    const result = await triggerValidation('url');
     if (result) {
-      clearError('url');
-      setLoading(true);
-
-      youtubeService.getTitle(url)
-        .then(title => {
-          setLoading(false);
-          setValue('title', title);
-        });
+      setTitleDebounced(url);
     }
   };
+  
+  const setTitleDebounced = debounce((url) => {
+    clearError('url');
+    setLoading(true);
+
+    youtubeService.getTitle(url)
+      .then(title => {
+        setLoading(false);
+        setValue('title', title);
+      })
+      .catch(() => {
+        setLoading(false);
+        setValue('title', defaultTitle);
+      });
+  }, 150);
 
   const onError = (output: string) => {
     setDownloading(false);
@@ -79,13 +88,13 @@ const App = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="form-group">
           <label htmlFor="url">YouTube URL</label>
-          <input id="url" name="url" className="form-control" ref={register(urlValidation)} onBlur={onUrlBlur} />
+          <input id="url" name="url" className="form-control" ref={register(urlValidation)} onChange={onUrlChange} />
           <ErrorMessage errors={errors} name="url" as="p" />
         </div>
         <div className="form-group">
           <label htmlFor="title">Title</label>
           {isLoading && <div className="spinner"><Spinner className="spinner" animation="border" as="span" /></div>}
-          {!isLoading && <input id="title" name="title" className="form-control" ref={register} />}
+          {!isLoading && <input id="title" name="title" className="form-control" defaultValue={defaultTitle} ref={register({ required: requiredMessage })} />}
         </div>
         <div className="form-group">
           <label htmlFor="directory">Folder</label>
@@ -94,7 +103,7 @@ const App = () => {
           <Button variant="secondary" type="button" size="lg" block>Select Folder</Button>
         </div>
         <div className="submit">
-          <Button variant="primary" type="submit" size="lg" block disabled={isDownloading}>
+          <Button variant="primary" type="submit" size="lg" block disabled={isDownloading || isLoading}>
             {!isDownloading && <span>Download</span>}
             {isDownloading && <><Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true"/> Downloading...</>}
           </Button>
