@@ -1,8 +1,7 @@
-import * as youtubedl from 'youtube-dl';
-import { YtInfo } from './youtubedl-info';
-
 const ffmpegPath = require('ffmpeg-static');
 const childProcess = require('child_process');
+
+const ytdlBinary = require('../youtube-dl/lib/get-binary')();
 
 /**
  * Handles any calls to Youtube via youtube-dl
@@ -14,9 +13,19 @@ class YoutubeService {
    * @param url 
    */
   public async getTitle(url: string): Promise<string> {
-    const options = ['-j', '--flat-playlist', '--dump-single-json'];
-    const info = await this.getVideoInfo(url, options);
-    return info ? info[0].fulltitle : '';
+    return new Promise((resolve, reject) => {
+
+      const process = childProcess.spawn(ytdlBinary, ['--get-title']);
+      process.stdout.on('data', data => {
+        console.log(data);
+      });
+      process.on('close', code => {
+        resolve(code);
+      });
+      process.on('error', err => {
+        reject(err);
+      });
+    });
   }
 
   /**
@@ -27,10 +36,9 @@ class YoutubeService {
    */
   public download(url: string, directory: string, title: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      const binaryPath = youtubedl.getYtdlBinary();
-      const options = this.getOptions(url, directory, title);
+      const options = this.getDownloadOptions(url, directory, title);
   
-      const process = childProcess.spawn(binaryPath, options);
+      const process = childProcess.spawn(ytdlBinary, options);
       process.on('close', code => {
         resolve(code);
       });
@@ -40,19 +48,7 @@ class YoutubeService {
     });
   }
 
-  private async getVideoInfo(url: string, options: any): Promise<Array<YtInfo>> {
-    return new Promise((resolve, reject) => {
-      youtubedl.getInfo(url, options, (error: Error, data: Array<YtInfo>) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(data);
-        }
-      });
-    });
-  }
-
-  private getOptions(url: string, directory: string, title: string): Array<string> {
+  private getDownloadOptions(url: string, directory: string, title: string): Array<string> {
     let options: Array<string> = [];
 
     // add url

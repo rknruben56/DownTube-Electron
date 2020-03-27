@@ -69,7 +69,6 @@ const rendererConfig = lodash.cloneDeep(commonConfig);
 rendererConfig.entry = './src/renderer/renderer.tsx';
 rendererConfig.target = 'electron-renderer';
 rendererConfig.output.filename = 'renderer.bundle.js';
-rendererConfig.node.__dirname = true;
 rendererConfig.plugins = [
   new HtmlWebpackPlugin({
     template: path.resolve(__dirname, './public/index.html'),
