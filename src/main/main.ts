@@ -14,7 +14,7 @@ function createWindow(): void {
         width: 800,
         webPreferences: {
             webSecurity: false,
-            devTools: process.env.NODE_ENV === 'production' ? false : true
+            devTools: true
         }
     });
 
@@ -26,6 +26,8 @@ function createWindow(): void {
             slashes: true
         })
     );
+
+    mainWindow.webContents.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', () => {
@@ -57,6 +59,3 @@ app.on('activate', () => {
         createWindow();
     }
 });
-
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
