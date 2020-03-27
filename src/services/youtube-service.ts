@@ -1,3 +1,4 @@
+import { chunksToLinesAsync } from '@rauschma/stringio';
 const ffmpegPath = require('ffmpeg-static');
 const childProcess = require('child_process');
 
@@ -12,20 +13,9 @@ class YoutubeService {
    * Gets the title of the video from the URL
    * @param url 
    */
-  public async getTitle(url: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-
-      const process = childProcess.spawn(ytdlBinary, ['--get-title']);
-      process.stdout.on('data', data => {
-        console.log(data);
-      });
-      process.on('close', code => {
-        resolve(code);
-      });
-      process.on('error', err => {
-        reject(err);
-      });
-    });
+  public getTitle(url: string): Promise<string> {
+    const process = childProcess.spawn(ytdlBinary, [url, '--get-title']);
+    return this.getTitleFromProcess(process.stdout);
   }
 
   /**
@@ -65,6 +55,15 @@ class YoutubeService {
     options.push('-o', downloadLocation);
 
     return options;
+  }
+
+  private async getTitleFromProcess(processOutput): Promise<string> {
+    for await (const line of chunksToLinesAsync(processOutput)) {
+      if (line) {
+        return line;
+      }
+    }
+    return '';
   }
 }
 export const youtubeService = new YoutubeService();

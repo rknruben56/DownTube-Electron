@@ -16,7 +16,9 @@
   "build": {
     "appId": "com.rknruben56.downtube",
     "productName": "DownTube",
-    "extraResources": ["./extraResources/**"],
+    "extraResources": [
+      "./extraResources/**"
+    ],
     "directories": {
       "app": "./dist/",
       "output": "./out/"
@@ -33,6 +35,7 @@
   "author": "rknruben56",
   "license": "MIT",
   "dependencies": {
+    "@rauschma/stringio": "^1.4.0",
     "bootstrap": "^4.4.1",
     "ffmpeg-static": "^4.0.1",
     "mkdirp": "^1.0.3",
