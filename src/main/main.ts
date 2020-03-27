@@ -27,7 +27,10 @@ function createWindow(): void {
         })
     );
 
-    mainWindow.webContents.openDevTools();
+    // Open dev tools when running in dev
+    if (process.env.NODE_ENV === 'development') {
+        mainWindow.webContents.openDevTools();
+    }
 
     // Emitted when the window is closed.
     mainWindow.on('closed', () => {

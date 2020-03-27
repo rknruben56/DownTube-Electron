@@ -1,8 +1,8 @@
-import * as youtubedl from 'youtube-dl';
-import { YtInfo } from './youtubedl-info';
-
+import { chunksToLinesAsync } from '@rauschma/stringio';
 const ffmpegPath = require('ffmpeg-static');
 const childProcess = require('child_process');
+
+const ytdlBinary = require('../youtube-dl/lib/get-binary')();
 
 /**
  * Handles any calls to Youtube via youtube-dl
@@ -13,10 +13,9 @@ class YoutubeService {
    * Gets the title of the video from the URL
    * @param url 
    */
-  public async getTitle(url: string): Promise<string> {
-    const options = ['-j', '--flat-playlist', '--dump-single-json'];
-    const info = await this.getVideoInfo(url, options);
-    return info ? info[0].fulltitle : '';
+  public getTitle(url: string): Promise<string> {
+    const process = childProcess.spawn(ytdlBinary, [url, '--get-title']);
+    return this.getTitleFromProcess(process.stdout);
   }
 
   /**
@@ -27,10 +26,9 @@ class YoutubeService {
    */
   public download(url: string, directory: string, title: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      const binaryPath = youtubedl.getYtdlBinary();
-      const options = this.getOptions(url, directory, title);
+      const options = this.getDownloadOptions(url, directory, title);
   
-      const process = childProcess.spawn(binaryPath, options);
+      const process = childProcess.spawn(ytdlBinary, options);
       process.on('close', code => {
         resolve(code);
       });
@@ -40,19 +38,7 @@ class YoutubeService {
     });
   }
 
-  private async getVideoInfo(url: string, options: any): Promise<Array<YtInfo>> {
-    return new Promise((resolve, reject) => {
-      youtubedl.getInfo(url, options, (error: Error, data: Array<YtInfo>) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(data);
-        }
-      });
-    });
-  }
-
-  private getOptions(url: string, directory: string, title: string): Array<string> {
+  private getDownloadOptions(url: string, directory: string, title: string): Array<string> {
     let options: Array<string> = [];
 
     // add url
@@ -69,6 +55,15 @@ class YoutubeService {
     options.push('-o', downloadLocation);
 
     return options;
+  }
+
+  private async getTitleFromProcess(processOutput): Promise<string> {
+    for await (const line of chunksToLinesAsync(processOutput)) {
+      if (line) {
+        return line;
+      }
+    }
+    return '';
   }
 }
 export const youtubeService = new YoutubeService();
