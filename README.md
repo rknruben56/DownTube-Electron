@@ -1,6 +1,33 @@
 # DownTube
 Electron app that downloads YouTube videos as MP3s.
 
+# Instructions To Run
+Clone the repo
+```
+git clone https://github.com/rknruben56/DownTube.git
+```
+
+Install necessary packages (post install script will install the youtube-dl.exe)
+```
+npm install
+```
+
+Run the dev server
+```
+npm run dev
+```
+
+Start the app
+```
+npm start
+```
+
+# Instructions to package
+After installing the dependencies, run the electron-builder to build the app for the specific os
+```
+npm run build:win
+```
+
 # Tech
 The code under 
 ```
