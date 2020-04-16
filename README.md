@@ -1,7 +1,7 @@
 # DownTube
 Electron app that downloads YouTube videos as MP3s.
 
-# Instructions To Run
+# Usage
 Clone the repo
 ```
 git clone https://github.com/rknruben56/DownTube.git
